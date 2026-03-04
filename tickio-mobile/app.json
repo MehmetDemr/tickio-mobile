@@ -4,7 +4,7 @@
     "slug": "tickio-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/tickio-mobile.png",
     "scheme": "tickiomobile",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -38,7 +38,8 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,
@@ -48,7 +49,8 @@
       "router": {},
       "eas": {
         "projectId": "876c9b55-b17d-4b07-bd06-adb64f7670b9"
-      }
+      },
+      "apiUrl": "http://10.0.2.2:3000"
     },
     "owner": "memt"
   }
