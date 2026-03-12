@@ -49,7 +49,7 @@ export default function LoginScreen() {
       const data = await login(email, password);
 
       console.log("Login successful:", data);
-      router.replace("/(dashboard)/mainpage");
+      router.replace("/(dashboard)");
     } catch (error: any) {
       console.log("Login failed:", error.message);
     } finally {
