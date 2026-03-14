@@ -31,7 +31,7 @@ export default function DashboardLayout() {
         <Tabs.Screen
           name="index"
           options={{
-            title: "Ana Sayfa",
+            title: "Home",
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="home-outline" color={color} size={size} />
             ),
@@ -41,7 +41,7 @@ export default function DashboardLayout() {
         <Tabs.Screen
           name="stats"
           options={{
-            title: "İstatistik",
+            title: "My Stats",
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="bar-chart-outline" color={color} size={size} />
             ),
@@ -51,7 +51,7 @@ export default function DashboardLayout() {
         <Tabs.Screen
           name="tasks"
           options={{
-            title: "Görev Ekle",
+            title: "Tasks",
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="add-circle-outline" color={color} size={size} />
             ),
@@ -60,7 +60,7 @@ export default function DashboardLayout() {
         <Tabs.Screen
           name="ranking"
           options={{
-            title: "Sıralama",
+            title: "Ranking",
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="trophy-outline" color={color} size={size} />
             ),
@@ -69,10 +69,24 @@ export default function DashboardLayout() {
         <Tabs.Screen
           name="profile"
           options={{
-            title: "Profil",
+            title: "Profile",
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="person-outline" color={color} size={size} />
             ),
+          }}
+        />
+
+        <Tabs.Screen
+          name="create-task"
+          options={{
+            href: null,
+          }}
+        />
+
+        <Tabs.Screen
+          name="edit-task"
+          options={{
+            href: null,
           }}
         />
       </Tabs>
