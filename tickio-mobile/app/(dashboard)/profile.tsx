@@ -1,20 +1,42 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, View, ActivityIndicator } from "react-native";
+import {
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { COLORS } from "../../src/constants/color";
 
-import ProfileHeader from "../../src/components/profile/ProfileHeader";
-import ProfileStatsRow from "../../src/components/profile/ProfileStatsRow";
-import ProfileSection from "../../src/components/profile/ProfileSection";
-import ProfileInfoRow from "../../src/components/profile/ProfileInfoRow";
-import TaskPreviewItem from "../../src/components/profile/TaskPreviewItem";
-import AchievementPreviewItem from "../../src/components/profile/AchievementPreviewItem";
+import {
+  getStatistic,
+  GetStatisticResponse,
+} from "@/src/api/statistics/getCurrentStatistics";
 import { getWhoAmI, WhoAmIResponse } from "../../src/api/auth/whoamiService";
+import AchievementPreviewItem from "../../src/components/profile/AchievementPreviewItem";
+import ProfileHeader from "../../src/components/profile/ProfileHeader";
+import ProfileInfoRow from "../../src/components/profile/ProfileInfoRow";
+import ProfileSection from "../../src/components/profile/ProfileSection";
+import ProfileStatsRow from "../../src/components/profile/ProfileStatsRow";
+import TaskPreviewItem from "../../src/components/profile/TaskPreviewItem";
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<WhoAmIResponse | null>(null);
+  const [stat, setStat] = useState<GetStatisticResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    async function loadStats() {
+      try {
+        const data = await getStatistic();
+        setStat(data);
+      } catch (error) {
+        console.log("Stat fetch failed:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
     async function loadProfile() {
       try {
         const data = await getWhoAmI();
@@ -25,8 +47,8 @@ export default function ProfilePage() {
         setLoading(false);
       }
     }
-
     loadProfile();
+    loadStats();
   }, []);
 
   if (loading) {
@@ -41,6 +63,14 @@ export default function ProfilePage() {
     return (
       <View style={styles.loaderWrap}>
         <Text style={styles.empty}>Profile data could not be loaded.</Text>
+      </View>
+    );
+  }
+
+  if (!stat) {
+    return (
+      <View style={styles.loaderWrap}>
+        <ActivityIndicator size="large" color={COLORS.brand} />
       </View>
     );
   }
@@ -67,7 +97,7 @@ export default function ProfilePage() {
           <ProfileInfoRow label="Join Date" value={joinedDate} />
           <ProfileInfoRow
             label="Finished Tasks"
-            value={String(profile.finishedTaskCount)}
+            value={String(stat.finishedTask)}
           />
         </ProfileSection>
 
@@ -75,9 +105,9 @@ export default function ProfilePage() {
           {profile.tasks.length === 0 ? (
             <Text style={styles.empty}>No tasks yet.</Text>
           ) : (
-            profile.tasks.slice(0, 3).map((task) => (
-              <TaskPreviewItem key={task.id} task={task} />
-            ))
+            profile.tasks
+              .slice(0, 3)
+              .map((task) => <TaskPreviewItem key={task.id} task={task} />)
           )}
         </ProfileSection>
 
@@ -85,12 +115,14 @@ export default function ProfilePage() {
           {profile.achievements.length === 0 ? (
             <Text style={styles.empty}>No achievements yet.</Text>
           ) : (
-            profile.achievements.slice(0, 3).map((achievement) => (
-              <AchievementPreviewItem
-                key={achievement.primary_achievement_id}
-                achievement={achievement}
-              />
-            ))
+            profile.achievements
+              .slice(0, 3)
+              .map((achievement) => (
+                <AchievementPreviewItem
+                  key={achievement.primary_achievement_id}
+                  achievement={achievement}
+                />
+              ))
           )}
         </ProfileSection>
 
