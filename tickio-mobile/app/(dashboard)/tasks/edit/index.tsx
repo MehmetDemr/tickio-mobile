@@ -11,8 +11,10 @@ import {
   View,
 } from "react-native";
 
+import { markTaskAsDone } from "../../../../src/api/tasks/doneTasksService";
 import { updateTask } from "../../../../src/api/tasks/updateTasksService";
 import { PrimaryButton } from "../../../../src/components/auth/AuthPrimaryButton";
+import AchievementPopup from "../../../../src/components/achievements/AchievementPopup";
 import TaskDateField from "../../../../src/components/tasks/TaskDateField";
 import TaskOptionGroup from "../../../../src/components/tasks/TaskOptionGroup";
 import { COLORS } from "../../../../src/constants/color";
@@ -34,6 +36,11 @@ const TASK_STATUS = [
   { label: "Done", value: "done" },
 ];
 
+type AchievementPopupItem = {
+  title: string;
+  description: string;
+};
+
 export default function EditTaskPage() {
   const params = useLocalSearchParams<{
     id: string;
@@ -46,12 +53,14 @@ export default function EditTaskPage() {
     active: string;
   }>();
 
+  const initialStatus = params.taskStatus || "pending";
+
   const [taskName, setTaskName] = useState(params.taskName || "");
   const [taskDescription, setTaskDescription] = useState(
     params.taskDescription || "",
   );
   const [taskType, setTaskType] = useState(params.taskType || "study");
-  const [taskStatus, setTaskStatus] = useState(params.taskStatus || "pending");
+  const [taskStatus, setTaskStatus] = useState(initialStatus);
   const [taskStartDate, setTaskStartDate] = useState(
     params.taskStartDate || "",
   );
@@ -59,6 +68,11 @@ export default function EditTaskPage() {
     params.taskFinishDate || "",
   );
   const [loading, setLoading] = useState(false);
+
+  const [achievementVisible, setAchievementVisible] = useState(false);
+  const [awardedAchievements, setAwardedAchievements] = useState<
+    AchievementPopupItem[]
+  >([]);
 
   const taskNameError = useMemo(() => {
     if (!taskName) return null;
@@ -74,13 +88,35 @@ export default function EditTaskPage() {
 
     setLoading(true);
     try {
+      const becameDone = initialStatus !== "done" && taskStatus === "done";
+
+      if (becameDone) {
+        const doneRes = await markTaskAsDone(params.id);
+
+        const awarded =
+          doneRes.awarded?.map((item) => ({
+            title: item.primaryAchievement.title,
+            description: item.primaryAchievement.description,
+          })) ?? [];
+
+        if (awarded.length > 0) {
+          setAwardedAchievements(awarded);
+          setAchievementVisible(true);
+        } else {
+          Alert.alert("Success", "Task completed successfully.");
+          router.back();
+        }
+
+        return;
+      }
+
       await updateTask(params.id, {
         taskName: taskName.trim(),
         taskDescription: taskDescription.trim(),
         taskType,
         taskStatus,
         taskStartDate,
-        taskFinishDate,
+        taskFinishDate: taskFinishDate || undefined,
         isActive: params.active === "true",
       });
 
@@ -91,6 +127,11 @@ export default function EditTaskPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function handleCloseAchievementPopup() {
+    setAchievementVisible(false);
+    router.back();
   }
 
   return (
@@ -176,6 +217,12 @@ export default function EditTaskPage() {
           <View style={{ height: 30 }} />
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <AchievementPopup
+        visible={achievementVisible}
+        achievements={awardedAchievements}
+        onClose={handleCloseAchievementPopup}
+      />
     </View>
   );
 }
