@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState,useCallback } from "react";
 import {
   ActivityIndicator,
   ScrollView,
@@ -19,37 +19,41 @@ import ProfileInfoRow from "../../../src/components/profile/ProfileInfoRow";
 import ProfileSection from "../../../src/components/profile/ProfileSection";
 import ProfileStatsRow from "../../../src/components/profile/ProfileStatsRow";
 import TaskPreviewItem from "../../../src/components/profile/TaskPreviewItem";
+import { useFocusEffect } from "expo-router";
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<WhoAmIResponse | null>(null);
   const [stat, setStat] = useState<GetStatisticResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function loadStats() {
-      try {
-        const data = await getStatistic();
-        setStat(data);
-      } catch (error) {
-        console.log("Stat fetch failed:", error);
-      } finally {
-        setLoading(false);
+  useFocusEffect(
+    useCallback(() => {
+      async function loadStats() {
+        try {
+          const data = await getStatistic();
+          setStat(data);
+        } catch (error) {
+          console.log("Stat fetch failed:", error);
+        } finally {
+          setLoading(false);
+        }
       }
-    }
-
-    async function loadProfile() {
-      try {
-        const data = await getWhoAmI();
-        setProfile(data);
-      } catch (error) {
-        console.log("Profile fetch failed:", error);
-      } finally {
-        setLoading(false);
+  
+      async function loadProfile() {
+        try {
+          const data = await getWhoAmI();
+          setProfile(data);
+        } catch (error) {
+          console.log("Profile fetch failed:", error);
+        } finally {
+          setLoading(false);
+        }
       }
-    }
-    loadProfile();
-    loadStats();
-  }, []);
+  
+      loadProfile();
+      loadStats();
+    }, [])
+  );
 
   if (loading) {
     return (

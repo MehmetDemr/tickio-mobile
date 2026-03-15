@@ -1,5 +1,5 @@
-import { router } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -30,21 +30,23 @@ export default function TasksPage() {
     hasPrev: false,
   });
 
-  useEffect(() => {
-    async function loadTasks() {
-      try {
-        const res = await getTasks(1, 10);
-        setTasks(res.data);
-        setMeta(res.meta);
-      } catch (error) {
-        console.log("Task fetch error:", error);
-      } finally {
-        setLoading(false);
+  useFocusEffect(
+    useCallback(() => {
+      async function loadTasks() {
+        try {
+          const res = await getTasks(1, 10);
+          setTasks(res.data);
+          setMeta(res.meta);
+        } catch (error) {
+          console.log("Task fetch error:", error);
+        } finally {
+          setLoading(false);
+        }
       }
-    }
-
-    loadTasks();
-  }, []);
+  
+      loadTasks();
+    }, [])
+  );
 
   const filteredTasks = useMemo(() => {
     if (filter === "all") return tasks;
