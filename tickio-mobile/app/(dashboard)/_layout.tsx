@@ -39,7 +39,7 @@ export default function DashboardLayout() {
         />
 
         <Tabs.Screen
-          name="stats"
+          name="stats/index"
           options={{
             title: "My Stats",
             tabBarIcon: ({ color, size }) => (
@@ -49,7 +49,7 @@ export default function DashboardLayout() {
         />
 
         <Tabs.Screen
-          name="tasks"
+          name="tasks/index"
           options={{
             title: "Tasks",
             tabBarIcon: ({ color, size }) => (
@@ -58,7 +58,7 @@ export default function DashboardLayout() {
           }}
         />
         <Tabs.Screen
-          name="ranking"
+          name="ranking/index"
           options={{
             title: "Ranking",
             tabBarIcon: ({ color, size }) => (
@@ -67,7 +67,7 @@ export default function DashboardLayout() {
           }}
         />
         <Tabs.Screen
-          name="profile"
+          name="profile/index"
           options={{
             title: "Profile",
             tabBarIcon: ({ color, size }) => (
@@ -77,14 +77,14 @@ export default function DashboardLayout() {
         />
 
         <Tabs.Screen
-          name="create-task"
+          name="tasks/create/index"
           options={{
             href: null,
           }}
         />
 
         <Tabs.Screen
-          name="edit-task"
+          name="tasks/edit/index"
           options={{
             href: null,
           }}

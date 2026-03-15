@@ -7,15 +7,15 @@ import {
   View,
 } from "react-native";
 
-import { COLORS } from "../../src/constants/color";
+import { COLORS } from "../../../src/constants/color";
 import {
   getStatistic,
   GetStatisticResponse,
-} from "../../src/api/statistics/getCurrentStatistics";
+} from "../../../src/api/statistics/getCurrentStatistics";
 
-import StatisticCard from "../../src/components/statistics/StatisticCard";
+import StatisticCard from "../../../src/components/statistics/StatisticCard";
 
-import StatisticInfoRow from "../../src/components/statistics/StatisticInfoRow";
+import StatisticInfoRow from "../../../src/components/statistics/StatisticInfoRow";
 
 
 export default function StatisticsPage() {
