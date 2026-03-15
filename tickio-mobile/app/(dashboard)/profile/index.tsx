@@ -6,19 +6,19 @@ import {
   Text,
   View,
 } from "react-native";
-import { COLORS } from "../../src/constants/color";
+import { COLORS } from "../../../src/constants/color";
 
 import {
   getStatistic,
   GetStatisticResponse,
 } from "@/src/api/statistics/getCurrentStatistics";
-import { getWhoAmI, WhoAmIResponse } from "../../src/api/auth/whoamiService";
-import AchievementPreviewItem from "../../src/components/profile/AchievementPreviewItem";
-import ProfileHeader from "../../src/components/profile/ProfileHeader";
-import ProfileInfoRow from "../../src/components/profile/ProfileInfoRow";
-import ProfileSection from "../../src/components/profile/ProfileSection";
-import ProfileStatsRow from "../../src/components/profile/ProfileStatsRow";
-import TaskPreviewItem from "../../src/components/profile/TaskPreviewItem";
+import { getWhoAmI, WhoAmIResponse } from "../../../src/api/auth/whoamiService";
+import AchievementPreviewItem from "../../../src/components/profile/AchievementPreviewItem";
+import ProfileHeader from "../../../src/components/profile/ProfileHeader";
+import ProfileInfoRow from "../../../src/components/profile/ProfileInfoRow";
+import ProfileSection from "../../../src/components/profile/ProfileSection";
+import ProfileStatsRow from "../../../src/components/profile/ProfileStatsRow";
+import TaskPreviewItem from "../../../src/components/profile/TaskPreviewItem";
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<WhoAmIResponse | null>(null);

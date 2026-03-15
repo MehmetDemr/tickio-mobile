@@ -9,13 +9,13 @@ import {
   View,
 } from "react-native";
 
-import { getTasks, TaskItem } from "../../src/api/tasks/getTasksService";
-import TaskCard from "../../src/components/tasks/TaskCard";
+import { getTasks, TaskItem } from "../../../src/api/tasks/getTasksService";
+import TaskCard from "../../../src/components/tasks/TaskCard";
 import TaskFilterTabs, {
   TaskFilter,
-} from "../../src/components/tasks/TaskFilterTabs";
-import TaskMiniStat from "../../src/components/tasks/TaskMiniStat";
-import { COLORS } from "../../src/constants/color";
+} from "../../../src/components/tasks/TaskFilterTabs";
+import TaskMiniStat from "../../../src/components/tasks/TaskMiniStat";
+import { COLORS } from "../../../src/constants/color";
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState<TaskItem[]>([]);
@@ -98,7 +98,7 @@ export default function TasksPage() {
               task={task}
               onDetails={() =>
                 router.push({
-                  pathname: "/(dashboard)/edit-task",
+                  pathname: "/(dashboard)/tasks/edit",
                   params: {
                     id: task.id,
                     taskName: task.taskName,
@@ -129,7 +129,7 @@ export default function TasksPage() {
 
       <Pressable
         style={styles.fab}
-        onPress={() => router.push("/(dashboard)/create-task")}
+        onPress={() => router.push("/(dashboard)/tasks/create")}
       >
         <Text style={styles.fabText}>＋</Text>
       </Pressable>

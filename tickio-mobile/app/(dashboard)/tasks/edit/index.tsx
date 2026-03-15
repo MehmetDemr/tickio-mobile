@@ -11,11 +11,11 @@ import {
   View,
 } from "react-native";
 
-import { updateTask } from "../../src/api/tasks/updateTasksService";
-import { PrimaryButton } from "../../src/components/auth/AuthPrimaryButton";
-import TaskDateField from "../../src/components/tasks/TaskDateField";
-import TaskOptionGroup from "../../src/components/tasks/TaskOptionGroup";
-import { COLORS } from "../../src/constants/color";
+import { updateTask } from "../../../../src/api/tasks/updateTasksService";
+import { PrimaryButton } from "../../../../src/components/auth/AuthPrimaryButton";
+import TaskDateField from "../../../../src/components/tasks/TaskDateField";
+import TaskOptionGroup from "../../../../src/components/tasks/TaskOptionGroup";
+import { COLORS } from "../../../../src/constants/color";
 
 const TASK_TYPES = [
   { label: "Study", value: "study" },
