@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState,useCallback } from "react";
 import {
   ActivityIndicator,
   ScrollView,
@@ -17,6 +17,7 @@ import TopThreeCard from "../../../src/components/ranking/TopThreeCard";
 import RankingRow from "../../../src/components/ranking/RankingRow";
 import PaginationControls from "../../../src/components/ranking/PaginationControls";
 import RankingSortTabs from "../../../src/components/ranking/RankingSortTabs";
+import { useFocusEffect } from "expo-router";
 
 export type SortField =
   | "totalTask"
@@ -59,9 +60,11 @@ export default function RankingPage() {
     }
   }
 
-  useEffect(() => {
-    loadRanking(1, sortField);
-  }, [sortField]);
+  useFocusEffect(
+    useCallback(() => {
+      loadRanking(1, sortField);
+    }, [sortField]) 
+  );       
 
   const topThree = useMemo(() => data.slice(0, 3), [data]);
   const rest = useMemo(() => data.slice(3), [data]);

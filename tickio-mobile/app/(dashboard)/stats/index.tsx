@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   ScrollView,
@@ -16,26 +16,29 @@ import {
 import StatisticCard from "../../../src/components/statistics/StatisticCard";
 
 import StatisticInfoRow from "../../../src/components/statistics/StatisticInfoRow";
+import { useFocusEffect } from "expo-router";
 
 
 export default function StatisticsPage() {
   const [stats, setStats] = useState<GetStatisticResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function loadStatistic() {
-      try {
-        const data = await getStatistic();
-        setStats(data);
-      } catch (error) {
-        console.log("Statistic page error:", error);
-      } finally {
-        setLoading(false);
+  useFocusEffect(
+    useCallback(() => {
+      async function loadStatistic() {
+        try {
+          const data = await getStatistic();
+          setStats(data);
+        } catch (error) {
+          console.log("Statistic page error:", error);
+        } finally {
+          setLoading(false);
+        }
       }
-    }
-
-    loadStatistic();
-  }, []);
+  
+      loadStatistic();
+    }, [])
+  );
 
 
   if (loading) {
