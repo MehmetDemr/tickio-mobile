@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { COLORS } from "../../src/constants/color";
 
@@ -9,6 +9,7 @@ import DashboardHeader from "../../src/components/dashboard/DashboardHeader";
 import FloatingAddButton from "../../src/components/dashboard/FloatingAddButton";
 import Section from "../../src/components/dashboard/Section";
 import TaskItem from "../../src/components/dashboard/TaskItem";
+import { useFocusEffect } from "expo-router";
 
 type Task = {
   id: string;
@@ -40,9 +41,11 @@ export default function MainPage() {
   const [stats, setStats] = useState<any>(null);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadData();
+    }, [])
+  );
 
   async function loadData() {
     try {
