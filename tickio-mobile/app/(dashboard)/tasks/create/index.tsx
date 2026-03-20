@@ -31,7 +31,6 @@ const TASK_TYPES = [
 const TASK_STATUS = [
   { label: "Pending", value: "pending" },
   { label: "In Progress", value: "in_progress" },
-  { label: "Done", value: "done" },
 ];
 
 export default function CreateTaskPage() {
@@ -42,17 +41,61 @@ export default function CreateTaskPage() {
   const [taskStartDate, setTaskStartDate] = useState("");
   const [taskFinishDate, setTaskFinishDate] = useState("");
   const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
   const taskNameError = useMemo(() => {
-    if (!taskName) return null;
-    return taskName.trim().length >= 3
-      ? null
-      : "Task name must be at least 3 characters.";
+    if (!taskName) return "Task name cannot be empty.";
+    if (taskName.trim().length < 3)
+      return "Task name must be at least 3 characters.";
+    return null;
   }, [taskName]);
 
-  const canSubmit = !!taskName && !!taskStartDate && !taskNameError && !loading;
+  const taskDescriptionError = useMemo(() => {
+    if (!taskDescription.trim()) return "Description cannot be empty.";
+    return null;
+  }, [taskDescription]);
+
+  const taskStatusError = useMemo(() => {
+    if (taskStatus === "done")
+      return "Task status cannot be 'Done' at creation.";
+    return null;
+  }, [taskStatus]);
+
+  const startDateError = useMemo(() => {
+    if (!taskStartDate) return "Start date cannot be empty.";
+    const start = new Date(taskStartDate);
+    start.setHours(0, 0, 0, 0);
+    if (start < today) return "Start date cannot be before today.";
+    return null;
+  }, [taskStartDate]);
+
+  const finishDateError = useMemo(() => {
+    if (!taskFinishDate) return "Finish date cannot be empty.";
+    const finish = new Date(taskFinishDate);
+    finish.setHours(0, 0, 0, 0);
+    if (finish < today) return "Finish date cannot be before today.";
+    if (taskStartDate) {
+      const start = new Date(taskStartDate);
+      start.setHours(0, 0, 0, 0);
+      if (finish < start) return "Finish date cannot be before start date.";
+    }
+    return null;
+  }, [taskFinishDate, taskStartDate]);
+
+  const hasErrors =
+    !!taskNameError ||
+    !!taskDescriptionError ||
+    !!taskStatusError ||
+    !!startDateError ||
+    !!finishDateError;
+
+  const canSubmit = !hasErrors && !loading;
 
   async function handleCreateTask() {
+    setSubmitted(true);
     if (!canSubmit) return;
 
     setLoading(true);
@@ -75,6 +118,7 @@ export default function CreateTaskPage() {
       setLoading(false);
     }
   }
+  const showError = (err: string | null) => (submitted ? err : null);
 
   return (
     <View style={styles.page}>
@@ -99,9 +143,12 @@ export default function CreateTaskPage() {
                 onChangeText={setTaskName}
                 placeholder="Enter task name"
                 placeholderTextColor="#6b7280"
-                style={styles.input}
+                style={[
+                  styles.input,
+                  submitted && taskNameError ? styles.inputError : null,
+                ]}
               />
-              {taskNameError ? (
+              {showError(taskNameError) ? (
                 <Text style={styles.error}>{taskNameError}</Text>
               ) : null}
             </View>
@@ -113,11 +160,18 @@ export default function CreateTaskPage() {
                 onChangeText={setTaskDescription}
                 placeholder="Enter description"
                 placeholderTextColor="#6b7280"
-                style={[styles.input, styles.textArea]}
+                style={[
+                  styles.input,
+                  styles.textArea,
+                  submitted && taskDescriptionError ? styles.inputError : null,
+                ]}
                 multiline
                 numberOfLines={4}
                 textAlignVertical="top"
               />
+              {showError(taskDescriptionError) ? (
+                <Text style={styles.error}>{taskDescriptionError}</Text>
+              ) : null}
             </View>
 
             <TaskOptionGroup
@@ -133,26 +187,31 @@ export default function CreateTaskPage() {
               value={taskStatus}
               onChange={setTaskStatus}
             />
+            {showError(taskStatusError) ? (
+              <Text style={styles.error}>{taskStatusError}</Text>
+            ) : null}
 
             <TaskDateField
               label="Start Date"
               value={taskStartDate}
-              onChangeText={setTaskStartDate}
-              placeholder="2026-03-14T00:00:00.000Z"
+              onChange={setTaskStartDate}
+              error={showError(startDateError)}
+              minimumDate={today}
             />
 
             <TaskDateField
               label="Finish Date"
               value={taskFinishDate}
-              onChangeText={setTaskFinishDate}
-              placeholder="2026-03-14T00:00:00.000Z"
+              onChange={setTaskFinishDate}
+              error={showError(finishDateError)}
+              minimumDate={taskStartDate ? new Date(taskStartDate) : today}
             />
 
             <PrimaryButton
               title="Create Task"
               onPress={handleCreateTask}
               loading={loading}
-              disabled={!canSubmit}
+              disabled={loading}
             />
           </View>
 
@@ -164,23 +223,14 @@ export default function CreateTaskPage() {
 }
 
 const styles = StyleSheet.create({
-  page: {
-    flex: 1,
-    backgroundColor: COLORS.soft,
-  },
-  flex: {
-    flex: 1,
-  },
+  page: { flex: 1, backgroundColor: COLORS.soft },
+  flex: { flex: 1 },
   content: {
     paddingHorizontal: 18,
     paddingTop: 14,
     paddingBottom: 24,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "900",
-    color: COLORS.dark,
-  },
+  title: { fontSize: 24, fontWeight: "900", color: COLORS.dark },
   subtitle: {
     marginTop: 4,
     fontSize: 13,
@@ -201,9 +251,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 10 },
     elevation: 3,
   },
-  fieldWrap: {
-    marginBottom: 14,
-  },
+  fieldWrap: { marginBottom: 14 },
   label: {
     fontSize: 13,
     fontWeight: "800",
@@ -221,9 +269,10 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: COLORS.dark,
   },
-  textArea: {
-    minHeight: 110,
+  inputError: {
+    borderColor: COLORS.accent,
   },
+  textArea: { minHeight: 110 },
   error: {
     marginTop: 6,
     fontSize: 12,

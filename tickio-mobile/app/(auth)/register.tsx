@@ -56,6 +56,10 @@ export default function RegisterPage() {
     if (!passwordSpecialChar) {
       return "Passwords cannot contain special characters.";
     }
+
+    if (!/[A-Z]/.test(password)) {
+      return "Password must contain at least one uppercase letter.";
+    }
   }, [password]);
 
   const password2Error = useMemo(() => {
