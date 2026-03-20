@@ -58,61 +58,64 @@ export default function LoginScreen() {
   }
 
   return (
-      <LoginLayout>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          style={styles.kav}
-        >
-          <View style={styles.card}>
-            <LogoCard
-              source={require("../src/assets/images/tickio-mobile.png")}
-            />
+    <LoginLayout>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={styles.kav}
+      >
+        <View style={styles.card}>
+          <LogoCard
+            source={require("../src/assets/images/tickio-mobile.png")}
+          />
 
-            <AuthTitle
-              title="Welcome back 👋"
-              subtitle="Log in to Tickio and continue the series."
-            />
+          <AuthTitle
+            title="Welcome back 👋"
+            subtitle="Log in to Tickio and continue the series."
+          />
 
-            <AuthTextField
-              label="Email"
-              value={email}
-              onChangeText={setEmail}
-              placeholder="example@gmail.com"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              error={emailError}
-            />
+          <AuthTextField
+            label="Email"
+            value={email}
+            onChangeText={setEmail}
+            placeholder="example@gmail.com"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            error={emailError}
+          />
 
-            <AuthTextField
-              label="Password"
-              value={password}
-              onChangeText={setPassword}
-              placeholder="••••••••"
-              secureTextEntry
-              secureToggle
-              error={passwordError}
-            />
+          <AuthTextField
+            label="Password"
+            value={password}
+            onChangeText={setPassword}
+            placeholder="••••••••"
+            secureTextEntry
+            secureToggle
+            error={passwordError}
+          />
 
-            <View style={styles.rowBetween}>
-              <TextButton title="Forgot Password" onPress={() => {}} />
-            </View>
-
-            <PrimaryButton
-              title="Log In"
-              onPress={handleLogin}
-              loading={loading}
-              disabled={!canSubmit}
-            />
-
-            <Divider text="or" />
-
+          <View style={styles.rowBetween}>
             <TextButton
-              title="Create an account"
-              onPress={() => router.push("/(auth)/register")}
+              title="Forgot Password"
+              onPress={() => router.push("/(auth)/forgot-password")}
             />
           </View>
-        </KeyboardAvoidingView>
-      </LoginLayout>
+
+          <PrimaryButton
+            title="Log In"
+            onPress={handleLogin}
+            loading={loading}
+            disabled={!canSubmit}
+          />
+
+          <Divider text="or" />
+
+          <TextButton
+            title="Create an account"
+            onPress={() => router.push("/(auth)/register")}
+          />
+        </View>
+      </KeyboardAvoidingView>
+    </LoginLayout>
   );
 }
 
