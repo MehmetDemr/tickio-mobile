@@ -13,8 +13,8 @@ import {
 
 import { markTaskAsDone } from "../../../../src/api/tasks/doneTasksService";
 import { updateTask } from "../../../../src/api/tasks/updateTasksService";
-import { PrimaryButton } from "../../../../src/components/auth/AuthPrimaryButton";
 import AchievementPopup from "../../../../src/components/achievements/AchievementPopup";
+import { PrimaryButton } from "../../../../src/components/auth/AuthPrimaryButton";
 import TaskDateField from "../../../../src/components/tasks/TaskDateField";
 import TaskOptionGroup from "../../../../src/components/tasks/TaskOptionGroup";
 import { COLORS } from "../../../../src/constants/color";
@@ -68,22 +68,61 @@ export default function EditTaskPage() {
     params.taskFinishDate || "",
   );
   const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const [achievementVisible, setAchievementVisible] = useState(false);
   const [awardedAchievements, setAwardedAchievements] = useState<
     AchievementPopupItem[]
   >([]);
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   const taskNameError = useMemo(() => {
-    if (!taskName) return null;
-    return taskName.trim().length >= 3
-      ? null
-      : "Task name must be at least 3 characters.";
+    if (!taskName) return "Task name cannot be empty.";
+    if (taskName.trim().length < 3)
+      return "Task name must be at least 3 characters.";
+    return null;
   }, [taskName]);
 
-  const canSubmit = !!taskName && !!taskStartDate && !taskNameError && !loading;
+  const taskDescriptionError = useMemo(() => {
+    if (!taskDescription.trim()) return "Description cannot be empty.";
+    return null;
+  }, [taskDescription]);
+
+  const startDateError = useMemo(() => {
+    if (!taskStartDate) return "Start date cannot be empty.";
+    const start = new Date(taskStartDate);
+    start.setHours(0, 0, 0, 0);
+    if (start < today) return "Start date cannot be before today.";
+    return null;
+  }, [taskStartDate]);
+
+  const finishDateError = useMemo(() => {
+    if (!taskFinishDate) return "Finish date cannot be empty.";
+    const finish = new Date(taskFinishDate);
+    finish.setHours(0, 0, 0, 0);
+    if (finish < today) return "Finish date cannot be before today.";
+    if (taskStartDate) {
+      const start = new Date(taskStartDate);
+      start.setHours(0, 0, 0, 0);
+      if (finish < start) return "Finish date cannot be before start date.";
+    }
+    return null;
+  }, [taskFinishDate, taskStartDate]);
+
+  const hasErrors =
+    !!taskNameError ||
+    !!taskDescriptionError ||
+    !!startDateError ||
+    !!finishDateError;
+
+  const canSubmit = !hasErrors && !loading;
+
+  const showError = (err: string | null) => (submitted ? err : null);
 
   async function handleUpdateTask() {
+    setSubmitted(true);
     if (!canSubmit || !params.id) return;
 
     setLoading(true);
@@ -145,9 +184,7 @@ export default function EditTaskPage() {
           showsVerticalScrollIndicator={false}
         >
           <Text style={styles.title}>Task Details</Text>
-          <Text style={styles.subtitle}>
-            Update your task and get going.
-          </Text>
+          <Text style={styles.subtitle}>Update your task and get going.</Text>
 
           <View style={styles.card}>
             <View style={styles.fieldWrap}>
@@ -157,9 +194,12 @@ export default function EditTaskPage() {
                 onChangeText={setTaskName}
                 placeholder="Enter task name"
                 placeholderTextColor="#6b7280"
-                style={styles.input}
+                style={[
+                  styles.input,
+                  submitted && taskNameError ? styles.inputError : null,
+                ]}
               />
-              {taskNameError ? (
+              {showError(taskNameError) ? (
                 <Text style={styles.error}>{taskNameError}</Text>
               ) : null}
             </View>
@@ -171,11 +211,18 @@ export default function EditTaskPage() {
                 onChangeText={setTaskDescription}
                 placeholder="Enter description"
                 placeholderTextColor="#6b7280"
-                style={[styles.input, styles.textArea]}
+                style={[
+                  styles.input,
+                  styles.textArea,
+                  submitted && taskDescriptionError ? styles.inputError : null,
+                ]}
                 multiline
                 numberOfLines={4}
                 textAlignVertical="top"
               />
+              {showError(taskDescriptionError) ? (
+                <Text style={styles.error}>{taskDescriptionError}</Text>
+              ) : null}
             </View>
 
             <TaskOptionGroup
@@ -195,22 +242,25 @@ export default function EditTaskPage() {
             <TaskDateField
               label="Start Date"
               value={taskStartDate}
-              onChangeText={setTaskStartDate}
-              placeholder="2026-03-14T00:00:00.000Z"
+              onChange={setTaskStartDate}
+              error={showError(startDateError)}
+              minimumDate={today}
+              disabled={true}
             />
 
             <TaskDateField
               label="Finish Date"
               value={taskFinishDate}
-              onChangeText={setTaskFinishDate}
-              placeholder="Optional"
+              onChange={setTaskFinishDate}
+              error={showError(finishDateError)}
+              minimumDate={taskStartDate ? new Date(taskStartDate) : today}
             />
 
             <PrimaryButton
               title="Update Task"
               onPress={handleUpdateTask}
               loading={loading}
-              disabled={!canSubmit}
+              disabled={loading}
             />
           </View>
 
@@ -228,23 +278,14 @@ export default function EditTaskPage() {
 }
 
 const styles = StyleSheet.create({
-  page: {
-    flex: 1,
-    backgroundColor: COLORS.soft,
-  },
-  flex: {
-    flex: 1,
-  },
+  page: { flex: 1, backgroundColor: COLORS.soft },
+  flex: { flex: 1 },
   content: {
     paddingHorizontal: 18,
     paddingTop: 14,
     paddingBottom: 24,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "900",
-    color: COLORS.dark,
-  },
+  title: { fontSize: 24, fontWeight: "900", color: COLORS.dark },
   subtitle: {
     marginTop: 4,
     fontSize: 13,
@@ -265,9 +306,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 10 },
     elevation: 3,
   },
-  fieldWrap: {
-    marginBottom: 14,
-  },
+  fieldWrap: { marginBottom: 14 },
   label: {
     fontSize: 13,
     fontWeight: "800",
@@ -285,9 +324,10 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: COLORS.dark,
   },
-  textArea: {
-    minHeight: 110,
+  inputError: {
+    borderColor: COLORS.accent,
   },
+  textArea: { minHeight: 110 },
   error: {
     marginTop: 6,
     fontSize: 12,
