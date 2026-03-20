@@ -3,13 +3,13 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { COLORS } from "../../src/constants/color";
 
 import StatsRow from "@/src/components/dashboard/StatsRow";
+import { useFocusEffect } from "expo-router";
 import { getWhoAmI } from "../../src/api/auth/whoamiService";
 import { getStatistic } from "../../src/api/statistics/getCurrentStatistics";
 import DashboardHeader from "../../src/components/dashboard/DashboardHeader";
 import FloatingAddButton from "../../src/components/dashboard/FloatingAddButton";
 import Section from "../../src/components/dashboard/Section";
 import TaskItem from "../../src/components/dashboard/TaskItem";
-import { useFocusEffect } from "expo-router";
 
 type Task = {
   id: string;
@@ -31,8 +31,8 @@ function isSameDay(date: Date, now: Date) {
   );
 }
 
-function isWithinLast7Days(date: Date, now: Date) {
-  const diff = (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24);
+function isWithinNext7Days(date: Date, now: Date) {
+  const diff = (date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
   return diff >= 0 && diff <= 7;
 }
 
@@ -44,7 +44,7 @@ export default function MainPage() {
   useFocusEffect(
     useCallback(() => {
       loadData();
-    }, [])
+    }, []),
   );
 
   async function loadData() {
@@ -58,7 +58,7 @@ export default function MainPage() {
         id: t.id,
         title: t.taskName,
         done: t.taskStatus === "done",
-        date: new Date(t.taskStartDate),
+        date: new Date(t.taskFinishDate),
       }));
 
       setTasks(mapped);
@@ -83,7 +83,7 @@ export default function MainPage() {
   const completedToday = todayTasks.filter((t) => t.done).length;
 
   const last7DaysTasks = useMemo(() => {
-    return tasks.filter((t) => isWithinLast7Days(t.date, now));
+    return tasks.filter((t) => isWithinNext7Days(t.date, now));
   }, [tasks]);
 
   return (
@@ -140,7 +140,7 @@ export default function MainPage() {
         <View style={{ height: 90 }} />
       </ScrollView>
 
-      <FloatingAddButton onPress={() => {}} />
+      
     </View>
   );
 }
