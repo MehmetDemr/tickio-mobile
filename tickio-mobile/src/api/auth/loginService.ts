@@ -36,7 +36,7 @@ export async function login(
 
     return { user: data };
   } catch (error) {
-    console.error("Login error:", error);
+    // console.error("Login error:", error);
     if (error instanceof Error) throw error;
     throw new Error("Login failed.");
   }
